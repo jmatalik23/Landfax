@@ -6,7 +6,7 @@ import '@geoman-io/leaflet-geoman-free';
 import 'leaflet-geoman-free/dist/leaflet-geoman.css';
 import { useEffect } from 'react';
 
-// This adds the drawing toolbar and acre labels
+// Geoman controls component
 function GeomanControls() {
   const map = useMap();
 
@@ -24,7 +24,6 @@ function GeomanControls() {
       removalMode: true,
     });
 
-    // Auto-label every polygon with acreage
     const updateArea = (e: any) => {
       const layer = e.layer;
       if (layer instanceof L.Polygon || layer instanceof L.Circle) {
@@ -41,14 +40,25 @@ function GeomanControls() {
 
     map.on('pm:create', updateArea);
     map.on('pm:edit', updateArea);
+
+    // Cleanup event listeners on unmount
+    return () => {
+      map.off('pm:create', updateArea);
+      map.off('pm:edit', updateArea);
+    };
   }, [map]);
 
   return null;
 }
 
-export default function Map() {
+// Map page component
+export default function MapPage() {
   return (
-    <MapContainer center={[39.5, -98.35]} zoom={5} style={{ height: '100vh', width: '100vw' }}>
+    <MapContainer
+      center={[39.5, -98.35]}
+      zoom={5}
+      style={{ height: '100vh', width: '100vw' }}
+    >
       {/* Satellite basemap */}
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
